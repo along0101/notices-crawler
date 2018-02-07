@@ -1,4 +1,4 @@
-#coding utf-8
+#-*- coding:utf-8 -*-
 #!/bin/python
 
 from selenium import webdriver
