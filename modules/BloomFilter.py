@@ -18,10 +18,6 @@ class SimpleHash(object):
 
 class BloomFilter(object):
 
-    '''
-    bloom class
-    '''
-
     def __init__(self, host='localhost', port=6379, db=0, blockNum=1, key='bloomfilter'):
         """
         :param host: the host of Redis
