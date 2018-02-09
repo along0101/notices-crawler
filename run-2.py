@@ -19,13 +19,12 @@ cap = dict(DesiredCapabilities.PHANTOMJS)
 cap["phantomjs.page.settings.userAgent"] = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36"
 cap["phantomjs.page.settings.loadImages"] = False
 
-driver = webdriver.PhantomJS(
-    desired_capabilities=cap, service_args=['--load-images=no'])
+driver = webdriver.PhantomJS(desired_capabilities=cap, service_args=['--load-images=no'])
 '''页面超时时间'''
-driver.set_page_load_timeout(20)
+driver.set_page_load_timeout(30)
 driver.set_window_size(1980, 1140)
 '''寻找一个元素的时间'''
-driver.implicitly_wait(10)
+driver.implicitly_wait(20)
 
 
 '''获取网页源代码内容'''
@@ -47,21 +46,22 @@ def get_text(url,max_retries = 1):
 
 
 '''链接数据库，获取股票代码列表'''
-db = pymysql.connect(host="192.168.0.103", user="root",
+def get_stock_list():
+    db = pymysql.connect(host="192.168.0.103", user="root",
                      password="123456", db="chocolate", charset='utf8mb4', port=3007)
 
-sql = "select `real`,`code`,`name`,`status` from company where 1"
+    sql = "select `real`,`code`,`name`,`status` from company where 1"
 
-with db.cursor() as cursor:
-    cursor.execute(sql)
-    stocks = cursor.fetchall()
-db.close()
+    with db.cursor() as cursor:
+        cursor.execute(sql)
+        stocks = cursor.fetchall()
+    db.close()
+    return stocks
 
 
-# 只能打开页面后添加
-#cookie = {"name": "foo", "value" : "bar"}
-# driver.add_cookie(cookie)
-driver.get('http://quote.eastmoney.com/sh600660.html')
+stocks = get_stock_list()
+
+
 
 #title = driver.find_element_by_css_selector('div.cont_txt>div.detail-header>h1').text
 #content = driver.find_element_by_css_selector("div.detail-body>div").text
@@ -76,12 +76,15 @@ for real, code, name, status in stocks:
         stockurl = "http://data.eastmoney.com/notices/getdata.ashx?StockCode=%s&CodeType=1&PageIndex=%s&PageSize=50&rt=1517979419" % (
             stock, i)
         html_page = get_text(stockurl,3)
-        items = re.findall(r'"NOTICEDATE":"(199|200|201[0-9].*?)T.*?"Url":"(.*?)"}', html_page)
+        items = re.findall(
+            r'"NOTICEDATE":"(199|200|201[0-9].*?)T.*?"Url":"(.*?)"}', html_page)
         for item in items:
             date,url = item
+            tries = 3
+
             #driver.get(url)
             print(date,url)
-            file = open('./data/%s_download_url.txt' % code, 'a')
+            file = open(code + '_download_url.txt', 'a')
             file.write('{"org_code":"%s","org_name":"%s","date":"%s","url":"%s"}\n' % (
                     code, name, date, url))
             file.close()
