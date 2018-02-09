@@ -80,9 +80,6 @@ for real, code, name, status in stocks:
             r'"NOTICEDATE":"(199|200|201[0-9].*?)T.*?"Url":"(.*?)"}', html_page)
         for item in items:
             date,url = item
-            tries = 3
-
-            #driver.get(url)
             print(date,url)
             file = open(code + '_download_url.txt', 'a')
             file.write('{"org_code":"%s","org_name":"%s","date":"%s","url":"%s"}\n' % (

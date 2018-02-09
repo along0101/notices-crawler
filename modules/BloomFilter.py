@@ -17,6 +17,11 @@ class SimpleHash(object):
 
 
 class BloomFilter(object):
+
+    '''
+    bloom class
+    '''
+
     def __init__(self, host='localhost', port=6379, db=0, blockNum=1, key='bloomfilter'):
         """
         :param host: the host of Redis
@@ -37,7 +42,7 @@ class BloomFilter(object):
     def isContains(self, str_input):
         if not str_input:
             return False
-        m5 = md5()
+        m5 = md5(str_input.encode('utf-8')).hexdigest()
         m5.update(str_input)
         str_input = m5.hexdigest()
         ret = True
