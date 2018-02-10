@@ -16,7 +16,6 @@ class Crawler(object):
     """
     爬虫，用于爬取东方财富中的股票公告内容
     """
-    request_count = 0
     driver = None
     downloaded_urls = []
     dum_md5_file = "./download.txt"
@@ -81,9 +80,6 @@ class Crawler(object):
                     file = open(self.time_out_file, 'a', encoding='utf-8')
                     file.write('%s\n' % url)
                     file.close()
-            finally:
-                self.request_count += 1
-                print(self.request_count)
 
     '''请求链接，打开页面'''
     def request(self,item,stock,max_retries = 1):
@@ -127,9 +123,6 @@ class Crawler(object):
                     file = open(self.time_out_file, 'a', encoding='utf-8')
                     file.write('%s\n' % url)
                     file.close()
-            finally:
-                self.request_count += 1
-                print(self.request_count)
 
 
     '''关闭浏览器'''
