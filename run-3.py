@@ -143,7 +143,7 @@ class Crawler(object):
                     sleep(2)
 
     '''打开浏览器'''
-    def open():
+    def open(self):
         self.driver = init_browser()
 
     '''关闭浏览器'''
