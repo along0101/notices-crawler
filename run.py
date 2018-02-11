@@ -105,7 +105,7 @@ class Crawler(object):
                 if not os.path.exists(dir):
                     os.makedirs(dir)
                 file = open(os.path.join(dir, fileName), 'w+', encoding='utf-8')
-                file.write('{"org_code":"%s","org_name":"%s","origin_url":"%s","title":"%s","content":"%s"}' % (stock[0], stock[1], pdfLink, title, content))
+                file.write('{"org_code":"%s","org_name":"%s","origin_url":"%s","title":"%s","content":"%s","publish_at":"%s"}' % (stock[0], stock[1], pdfLink, title, content,date))
                 file.close()
 
                 print("success", stock[0], date)
@@ -130,7 +130,7 @@ class Crawler(object):
         self.driver.quit()
 
 
-# 输出格式:{org_code,org_name,type=股东大会决议公告,title,digest,publish_at,prigin_url,create_at=time()}
+# 输出格式:{org_code,org_name,type=股东大会决议公告,title,digest,publish_at,origin_url,create_at=time.time()}
 #print(strftime('%Y-%m-%d %H:%M:%S', localtime()))
 
 def request_logger(item):

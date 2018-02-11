@@ -109,7 +109,7 @@ class Crawler(object):
                 if not os.path.exists(dir):
                     os.makedirs(dir)
                 file = open(os.path.join(dir, fileName), 'w+', encoding='utf-8')
-                file.write('{"org_code":"%s","org_name":"%s","origin_url":"%s","title":"%s","content":"%s"}' % (stock[0], stock[1], pdfLink, title, content))
+                file.write('{"org_code":"%s","org_name":"%s","origin_url":"%s","title":"%s","content":"%s","publish_at":"%s"}' % (stock[0], stock[1], pdfLink, title, content,date))
                 file.close()
 
                 print("success", stock[0], date)

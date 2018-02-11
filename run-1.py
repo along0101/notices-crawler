@@ -16,7 +16,7 @@ import './Crawler'
 '''
 类封装版本 version modules
 
-输出格式:{org_code,org_name,type=股东大会决议公告,title,digest,publish_at,prigin_url,create_at=time()}
+输出格式:{org_code,org_name,type=股东大会决议公告,title,digest,publish_at,origin_url,create_at=time()}
 print(strftime('%Y-%m-%d %H:%M:%S', localtime()))
 '''
 

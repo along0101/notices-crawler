@@ -78,9 +78,10 @@ class Crawler(object):
                 return html_page
             except Exception as e:
                 i += 1
-                print('time_out,retries %d.' % i, date, "ext", e)
+                print('time_out,retries %d.' % i, date)
                 '''记日志'''
                 if max_retries == i:
+                    print(e)
                     file = open(self.time_out_file, 'a', encoding='utf-8')
                     file.write('%s\n' % url)
                     file.close()
@@ -90,7 +91,8 @@ class Crawler(object):
                     self.request_count = 0
                     self.close()
                     self.open()
-                    sleep(2)
+                    print('reopen virtual browser')
+                    sleep(3)
 
     '''请求链接，打开页面'''
     def request(self,item,stock,max_retries = 1):
@@ -116,7 +118,7 @@ class Crawler(object):
                 if not os.path.exists(dir):
                     os.makedirs(dir)
                 file = open(os.path.join(dir, fileName), 'w+', encoding='utf-8')
-                file.write('{"org_code":"%s","org_name":"%s","origin_url":"%s","title":"%s","content":"%s"}' % (stock[0], stock[1], pdfLink, title, content))
+                file.write('{"org_code":"%s","org_name":"%s","origin_url":"%s","title":"%s","content":"%s","publish_at":"%s"}' % (stock[0], stock[1], pdfLink, title, content, date))
                 file.close()
 
                 print("success", stock[0], date)
@@ -128,9 +130,10 @@ class Crawler(object):
                 break
             except Exception as e:
                 i += 1
-                print('time_out,retries %d.' % i, date, "ext", e)
+                print('time_out,retries %d.' % i, date)
                 '''记日志'''
                 if max_retries == i:
+                    print(e)
                     file = open(self.time_out_file, 'a', encoding='utf-8')
                     file.write('%s\n' % url)
                     file.close()
@@ -140,7 +143,8 @@ class Crawler(object):
                     self.request_count = 0
                     self.close()
                     self.open()
-                    sleep(2)
+                    print('reopen virtual browser')
+                    sleep(3)
 
     '''打开浏览器'''
     def open(self):
@@ -151,7 +155,7 @@ class Crawler(object):
         self.driver.quit()
 
 
-# 输出格式:{org_code,org_name,type=股东大会决议公告,title,digest,publish_at,prigin_url,create_at=time()}
+# 输出格式:{org_code,org_name,type=股东大会决议公告,title,digest,publish_at,origin_url,create_at=time()}
 #print(strftime('%Y-%m-%d %H:%M:%S', localtime()))
 
 def request_logger(item):
@@ -190,28 +194,29 @@ if __name__ == '__main__':
                 stock, i)
             md5_url = md5(stockurl.encode('utf-8')).hexdigest()
             try:
-                file = open("./crawled_page.txt","r",encoding='utf-8')
+                file = open("./crawled_page.txt", "r", encoding='utf-8')
                 _pages = file.readlines()
                 file.close()
             except Exception as e:
-                file = open("./crawled_page.txt","a",encoding='utf-8')
+                file = open("./crawled_page.txt", "a", encoding='utf-8')
                 file.close()
             if md5_url + "\n" in _pages:
                 continue
 
+            '''
+            re.findall(r'"NOTICEDATE":"(199|200|201[0-9].*?)T.*?"Url":"(.*?)"}', html_page)
+            减少年份，获取2014至今的公告
+            '''
             html_page = crawler.get_text(stockurl,3)
-            #re.findall(r'"NOTICEDATE":"(199|200|201[0-9].*?)T.*?"Url":"(.*?)"}', html_page)
-            #减少年份，获取2014至今的公告
             items = re.findall(r'"NOTICEDATE":"(201[4-9].*?)T.*?"Url":"(.*?)"}', html_page)
             for item in items:
-                #date,url = item
-                #print(date,url)
-                #request_logger([code,date,url])
                 crawler.request(item, [code, name], 3)
+
             #再做一次判断，减少请求
             file = open("./crawled_page.txt","a",encoding='utf-8')
             file.write('%s\n' % md5_url)
             file.close()
+
         file = open("./crawled_stocks.txt", 'a', encoding='utf-8')
         file.write('%s\n' % stock)
         file.close()
