@@ -42,48 +42,65 @@ def gci(filepath):
 if __name__ == '__main__':
 
 	limit = 0
+	InsertPerOnce = 5
 	keys = "(org_code,org_name,title,digest,origin_url,publish_at,create_at)"
 	sql = "insert into company_bulletin%s values" % keys
 	now = math.floor(time.time())
 	rows = []
+
 	'''方案2 walk遍历'''
 	for fpathe,dirs,fs in os.walk('./data'):
 		for f in fs:
 			filename = os.path.join(fpathe,f)
-			limit += 1
 			try:
-				#file = open(filename, encoding='utf-8', errors='ignore')
-				file = open(filename,encoding='utf-8')
-				data = json.loads(file.read(),strict=False)
+				print(filename)
+				file = open(filename, encoding='utf-8', errors='ignore')
+				data = json.loads(file.read(), strict=False)
 				file.close()
 				if hasattr(data,"publish_at"):
 					date = data["publish_at"]
 				else:
 					date = "0000-00-00"
-				#print(filename)
-				#time.sleep(5)
-
+				
 				row = '("%s","%s","%s","%s","%s","%s",%d)' % (data["org_code"],data["org_name"],data["title"],data["content"],data["origin_url"],date,now)
 				rows.append(row)
-				if limit==1000:
-					db = connect_db()
-					with db.cursor() as cursor:
-						cursor.execute(sql + ",".join(rows))
+				limit += 1
+				if limit == InsertPerOnce:
+					try:
+						db = connect_db()
+						with db.cursor() as cursor:
+							cursor.execute(sql + ",".join(rows))
 						db.commit()
-					db.close()
-					rows = []
-					limit = 0
-					print('insert 1000 rows')
+						rows = []
+						limit = 0
+						print('insert %d rows' % InsertPerOnce)
+					except Exception as e:
+						db.rollback()
+						print(e)
+					finally:
+						db.close()
+				
 			except Exception as e:
-				print(e)
+				'''
+				file = open('./invalid-json.txt',"a",encoding='utf-8')
+				file.write("file:%s ,reason:%s \n" % (filename , str(e)))
+				file.close()
+				'''
+				print('except',e)
+
 	#导入剩下的记录
 	if rows:
-		db = connect_db()
-		with db.cursor() as cursor:
-			cursor.execute(sql + ",".join(rows))
+		try:
+			db = connect_db()
+			with db.cursor() as cursor:
+				cursor.execute(sql + ",".join(rows))
 			db.commit()
-		db.close()
-		print('insert %d rows' % limit)
+			print('insert %d rows' % limit)
+		except Exception as e:
+			db.rollback()
+			print(e)
+		finally:
+			db.close()
 
 	print('done')
 
