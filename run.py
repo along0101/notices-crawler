@@ -71,6 +71,7 @@ class Crawler(object):
         with self.db.cursor() as cursor:
             cursor.execute(sql)
             stocks = cursor.fetchall()
+            self.db.close()
         self.stocks = stocks
         return self.stocks
 
@@ -125,7 +126,8 @@ class Crawler(object):
                 if not os.path.exists(dir):
                     os.makedirs(dir)
                 file = open(os.path.join(dir, fileName), 'w+', encoding='utf-8')
-                file.write('{"org_code":"%s","org_name":"%s","origin_url":"%s","title":"%s","content":"%s","publish_at":"%s"}' % (stock[0], stock[1], pdfLink, title, content, date))
+                file.write('{"org_code":"%s","org_name":"%s","origin_url":"%s","title":"%s","content":"%s","publish_at":"%s"}' % (
+                    stock[0], stock[1], pdfLink, title.replace('"', '\\"'), content.replace('"', '\\"'), date))
                 file.close()
 
                 print("success", stock[0], date)
@@ -154,16 +156,14 @@ class Crawler(object):
                     sleep(2)
 
 
-    '''打开浏览器,数据库链接'''
+    '''打开浏览器'''
     def open(self):
         self.driver = init_browser()
-        self.db = connect_db()
 
 
-    '''关闭浏览器,数据库链接'''
+    '''关闭浏览器'''
     def close(self):
         self.driver.quit()
-        self.db.close()
 
 
 '''
@@ -193,7 +193,6 @@ if __name__ == '__main__':
 
         #跳过爬过的股票代码
         if stock + "\n" in _done:
-            print("pass crawled %s" % code)
             continue
 
         for i in range(1, 20):
