@@ -12,6 +12,14 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 #from pybloomfilter import BloomFilter
 
 
+'''
+添加分页过滤，爬取过的过票过滤，提高速度版本
+
+Notice:不能处理多次urlopen被服务主机拒绝访问的问题
+       相应的升级版本 run-3.py
+'''
+
+
 class Crawler(object):
     """
     爬虫，用于爬取东方财富中的股票公告内容
