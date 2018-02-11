@@ -37,7 +37,7 @@ class Crawler(object):
     driver = None
     downloaded_urls = []
     dum_md5_file = "./download.txt"
-    time_out_file = "./data/time_out.log"
+    time_out_file = "./time_out.log"
 
     def __init__(self):
         super(Crawler, self).__init__()

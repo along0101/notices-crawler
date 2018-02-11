@@ -28,7 +28,7 @@ class Crawler(object):
     driver = None
     downloaded_urls = []
     dum_md5_file = "./download.txt"
-    time_out_file = "./data/time_out.log"
+    time_out_file = "./time_out.log"
     #bloom_download_urls = BloomFilter(1024 * 1024 * 16, 0.01)
     cur_queue = deque()
 
