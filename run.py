@@ -4,6 +4,7 @@
 import os
 import re
 import math
+import json
 import pymysql
 from hashlib import md5
 from time import strftime, localtime, time, sleep,ctime
@@ -120,14 +121,14 @@ class Crawler(object):
                 title = title.split(" ")[0]
                 content = self.driver.find_element_by_css_selector("div.content.clearfix>div.cont_txt>div.detail-body>div:nth-child(1)").text
                 pdfLink = self.driver.find_element_by_css_selector('div.cont_txt>div.detail-body>div:nth-child(2)>a').get_attribute("href")
+                data = {"org_code":stock[0],"org_name":stock[1],"origin_url":pdfLink,"title":title,"content":content,"publish_at":date}
                 
                 fileName = md5_url + ".json"
                 dir = './data/%s/%s/%s/' % (stock[0], ymd[0], "-".join(ymd[0:2]))
                 if not os.path.exists(dir):
                     os.makedirs(dir)
                 file = open(os.path.join(dir, fileName), 'w+', encoding='utf-8')
-                file.write('{"org_code":"%s","org_name":"%s","origin_url":"%s","title":"%s","content":"%s","publish_at":"%s"}' % (
-                    stock[0], stock[1], pdfLink, title.replace('"', '\\"'), content.replace('"', '\\"'), date))
+                file.write(json.dumps(data, ensure_ascii=False))
                 file.close()
 
                 print("success", stock[0], date)
