@@ -61,7 +61,7 @@ if __name__ == '__main__':
 					date = data["publish_at"]
 				else:
 					date = "0000-00-00"
-				
+				'''
 				row = '("%s","%s","%s","%s","%s","%s",%d)' % (data["org_code"],data["org_name"],data["title"],data["content"],data["origin_url"],date,now)
 				rows.append(row)
 				limit += 1
@@ -79,16 +79,18 @@ if __name__ == '__main__':
 						print(e)
 					finally:
 						db.close()
+				'''
 				
 			except Exception as e:
-				'''
+				
 				file = open('./invalid-json.txt',"a",encoding='utf-8')
 				file.write("file:%s ,reason:%s \n" % (filename , str(e)))
 				file.close()
-				'''
+				
 				print('except',e)
 
 	#导入剩下的记录
+	'''
 	if rows:
 		try:
 			db = connect_db()
@@ -101,6 +103,7 @@ if __name__ == '__main__':
 			print(e)
 		finally:
 			db.close()
+	'''
 
 	print('done')
 

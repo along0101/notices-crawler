@@ -3,6 +3,7 @@
 
 import os
 import math
+import re
 import time
 import json
 
@@ -14,13 +15,11 @@ json文件修复，用于修复下载的文件中
 
 
 
-
 if __name__ == '__main__':
 
 	now = math.floor(time.time())
 	count = 0
 
-	'''方案2 walk遍历'''
 	for fpathe,dirs,fs in os.walk('./data'):
 		for f in fs:
 			filename = os.path.join(fpathe,f)
@@ -34,18 +33,18 @@ if __name__ == '__main__':
 			except Exception as e:
 				'''专门修复异常的'''
 				file = open(filename, encoding='utf-8')
-				content_string = file.read()
+				raw_str = file.read()
+				_str = raw_str.replace('{"', '').replace('"}', '').replace('":"', '","')
+				_arr = _str.split('","')
+				#todo
+				new_str = re.sub(r'content:"(")','\"',raw_str)
+				#file.write(new_str)
 				file.close()
-				count +=1
-				print(count)
-				'''
-				file = open('./invalid-json.txt',"a",encoding='utf-8')
-				file.write("file:%s ,reason:%s \n" % (filename , str(e)))
-				file.close()
-				'''
-				#print('except',e)
-				pass
-
+				
+				fs = open("./test.json","w+",encoding="utf-8")
+				fs.write(new_str)
+				fs.close()
+				time.sleep(300)
 
 	print('done')
 
