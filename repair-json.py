@@ -13,6 +13,8 @@ import json
 json文件修复，用于修复下载的文件中
 '''
 
+#合并数组键=》值变成字典
+#dict(zip(arr1,arr2))
 
 
 if __name__ == '__main__':
@@ -24,7 +26,6 @@ if __name__ == '__main__':
 		for f in fs:
 			filename = os.path.join(fpathe,f)
 			try:
-				#print(filename)
 				file = open(filename, encoding='utf-8')
 				#strict=False是允许字符串中出现\r \n
 				json.loads(file.read(), strict=False)
@@ -32,19 +33,33 @@ if __name__ == '__main__':
 				file.close()
 			except Exception as e:
 				'''专门修复异常的'''
-				file = open(filename, encoding='utf-8')
+				count += 1
+				file = open(filename, 'r', encoding='utf-8')
 				raw_str = file.read()
+				file.close()
 				_str = raw_str.replace('{"', '').replace('"}', '').replace('":"', '","')
 				_arr = _str.split('","')
-				#todo
-				new_str = re.sub(r'content:"(")','\"',raw_str)
-				#file.write(new_str)
+				_keys = []
+				_values = []
+				for i in range(len(_arr)):
+					if i & 1:
+						_values.append(_arr[i])
+					else:
+						_keys.append(_arr[i])
+
+				_dict = dict(zip(_keys,_values))
+				new_str = json.dumps(_dict,ensure_ascii=False)
+				'''写回去'''
+				file = open(filename, 'w', encoding='utf-8')
+				file.write(new_str)
 				file.close()
-				
+				print('fixed',filename)
+				'''
+				#用于测试观察
 				fs = open("./test.json","w+",encoding="utf-8")
 				fs.write(new_str)
 				fs.close()
 				time.sleep(300)
-
-	print('done')
+				'''
+	print('done','fixed %d' % count)
 
