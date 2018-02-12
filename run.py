@@ -12,7 +12,7 @@ from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 '''
-v 1.0版，根据run-x.py一步步升级改造而来
+v1.0版，根据run-x.py一步步升级改造而来
 
 特点：
 1.快速过滤爬取过的页面记录
@@ -28,9 +28,9 @@ def init_browser():
     cap["version"] = "63.0.3239.84"
     cap["javascriptEnabled"] = False
     driver = webdriver.PhantomJS(desired_capabilities=cap, service_args=['--load-images=no'])
-    driver.set_page_load_timeout(10) #页面超时时间
+    driver.set_page_load_timeout(15) #页面超时时间
     driver.set_window_size(1980, 1140)
-    driver.implicitly_wait(10) #寻找一个元素的时间
+    driver.implicitly_wait(15) #寻找一个元素的时间
     return driver
 
 '''链接数据库'''
@@ -209,9 +209,8 @@ if __name__ == '__main__':
                 file = open("./crawled_page.txt", "a", encoding='utf-8')
                 file.close()
 
-            #跳过怕去过的分页
+            #跳过爬过的分页
             if md5_url + "\n" in _pages:
-                print("pass crawled page")
                 continue
 
             '''
@@ -221,8 +220,9 @@ if __name__ == '__main__':
             html_page = crawler.get_text(stockurl,3)
             items = re.findall(r'"NOTICEDATE":"(201[4-9].*?)T.*?"Url":"(.*?)"}', html_page)
             for item in items:
-                crawler.request(item, [code, name], 3)
-                #sleep(CRAWL_DELAY)
+                if item:
+                    crawler.request(item, [code, name], 3)
+                    sleep(CRAWL_DELAY)
 
             #记录爬取过的分页页面
             file = open("./crawled_page.txt", "a", encoding='utf-8')
