@@ -1,10 +1,7 @@
 #!/bin/python3
 #-*- coding:utf-8 -*-
 
-import os
-import re
-import math
-import json
+import os,re,math,json
 import pymysql
 from hashlib import md5
 from time import strftime, localtime, time, sleep,ctime
@@ -27,6 +24,12 @@ def init_browser():
     cap = dict(DesiredCapabilities.CHROME)
     cap["version"] = "63.0.3239.84"
     cap["javascriptEnabled"] = False
+    cap["loadImages"] = False
+    #page.settings.userAgent
+    #phantomjs.page.settings.loadImages
+    cap["settings.userAgent"] = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36"
+    cap["userAgent"] = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36"
+    cap["browser"] = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36"
     driver = webdriver.PhantomJS(desired_capabilities=cap, service_args=['--load-images=no'])
     driver.set_page_load_timeout(15) #页面超时时间
     driver.set_window_size(1980, 1140)
@@ -217,17 +220,21 @@ if __name__ == '__main__':
             re.findall(r'"NOTICEDATE":"(199|200|201[0-9].*?)T.*?"Url":"(.*?)"}', html_page)
             减少年份，获取2014至今的公告
             '''
-            html_page = crawler.get_text(stockurl,3)
-            items = re.findall(r'"NOTICEDATE":"(201[4-9].*?)T.*?"Url":"(.*?)"}', html_page)
-            for item in items:
-                if item:
-                    crawler.request(item, [code, name], 3)
-                    sleep(CRAWL_DELAY)
+            try:
+                html_page = crawler.get_text(stockurl,3)
+                items = re.findall(r'"NOTICEDATE":"(201[5-9].*?)T.*?"Url":"(.*?)"}', html_page)
+                for item in items:
+                    if item:
+                        crawler.request(item, [code, name], 3)
+                        sleep(CRAWL_DELAY)
 
-            #记录爬取过的分页页面
-            file = open("./crawled_page.txt", "a", encoding='utf-8')
-            file.write('%s\n' % md5_url)
-            file.close()
+                #记录爬取过的分页页面
+                file = open("./crawled_page.txt", "a", encoding='utf-8')
+                file.write('%s\n' % md5_url)
+                file.close()
+            except Exception as e:
+                pass
+            
 
         #记录爬取过的股票
         file = open("./crawled_stocks.txt", 'a', encoding='utf-8')
